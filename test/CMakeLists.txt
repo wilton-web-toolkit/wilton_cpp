@@ -61,8 +61,9 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_cpp )
-set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton )
-staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
+
+set ( ${PROJECT_NAME}_DEPS wilton_cpp )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # tests
 set ( ${PROJECT_NAME}_TEST_INCLUDES ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
