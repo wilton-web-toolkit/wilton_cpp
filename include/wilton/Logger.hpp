@@ -22,13 +22,22 @@ protected:
      */
     class Impl;
 public:
-    static void debug(const icu::UnicodeString& message);
+    /**
+     * PIMPL-specific constructor
+     * 
+     * @param pimpl impl object
+     */
+    PIMPL_CONSTRUCTOR(Logger)
+            
+    Logger(const icu::UnicodeString& logger_name);
     
-    static void info(const icu::UnicodeString& message);
+    void debug(const icu::UnicodeString& message);
     
-    static void warn(const icu::UnicodeString& message);
+    void info(const icu::UnicodeString& message);
     
-    static void error(const icu::UnicodeString& message);
+    void warn(const icu::UnicodeString& message);
+    
+    void error(const icu::UnicodeString& message);
 
 };
 

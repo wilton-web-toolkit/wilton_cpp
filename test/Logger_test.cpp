@@ -13,10 +13,11 @@
 #include "staticlib/config/assert.hpp"
 
 void test_link() {
-    wilton::Logger::debug("foo");
-    wilton::Logger::info("bar");
-    wilton::Logger::warn("baz");
-    wilton::Logger::error("42");
+    auto logger = wilton::Logger("test");
+    logger.debug("foo");
+    logger.info("bar");
+    logger.warn("baz");
+    logger.error("42");
 }
 
 int main() {

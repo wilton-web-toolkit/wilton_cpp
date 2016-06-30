@@ -81,6 +81,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_cron
         staticlib_serialization
         staticlib_utils
+        staticlib_icu
         log4cplus
         mstch
         soci
