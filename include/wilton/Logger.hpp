@@ -9,10 +9,18 @@
 #define	WILTON_LOGGER_HPP
 
 #include <unicode/unistr.h>
+#include "staticlib/pimpl.hpp"
+
+#include "wilton/WiltonException.hpp"
 
 namespace wilton {
 
-class Logger {
+class Logger : public staticlib::pimpl::PimplObject {
+protected:
+    /**
+     * Implementation class
+     */
+    class Impl;
 public:
     static void debug(const icu::UnicodeString& message);
     

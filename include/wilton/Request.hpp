@@ -11,11 +11,26 @@
 #include <map>
 
 #include <unicode/unistr.h>
+#include "staticlib/pimpl.hpp"
+
+#include "wilton/WiltonException.hpp"
 
 namespace wilton {
 
-class Request {
+class Request : public staticlib::pimpl::PimplObject {
+protected:
+    /**
+     * Implementation class
+     */
+    class Impl;
 public:
+    /**
+     * PIMPL-specific constructor
+     * 
+     * @param pimpl impl object
+     */
+    PIMPL_CONSTRUCTOR(Request)
+            
     const icu::UnicodeString& get_http_version() const;
     
     const icu::UnicodeString& get_protocol() const;

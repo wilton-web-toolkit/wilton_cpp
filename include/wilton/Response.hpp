@@ -13,11 +13,25 @@
 #include <map>
 
 #include <unicode/unistr.h>
+#include "staticlib/pimpl.hpp"
+
+#include "wilton/WiltonException.hpp"
 
 namespace wilton {
 
-class Response {
+class Response : public staticlib::pimpl::PimplObject {
+protected:
+    /**
+     * Implementation class
+     */
+    class Impl;
 public:
+    /**
+     * PIMPL-specific constructor
+     * 
+     * @param pimpl impl object
+     */
+    PIMPL_CONSTRUCTOR(Response)
     
     void set_status_code(uint16_t code);
     
