@@ -47,8 +47,7 @@ public:
     
     icu::UnicodeString get_data() const;
     
-private:
-    Request(void* /* type */ param);
+    Request(void* /* wilton_Request* */);
     
 };
 

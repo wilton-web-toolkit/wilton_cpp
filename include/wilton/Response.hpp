@@ -43,8 +43,7 @@ public:
     
     void send(const icu::UnicodeString& data);
 
-private:
-    Response(void* /* type */ param);    
+    Response(void* /* wilton_Request* */);
 };
 
 } // namespace

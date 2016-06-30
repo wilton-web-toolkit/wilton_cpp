@@ -20,6 +20,8 @@ typedef std::map<icu::UnicodeString, icu::UnicodeString>& headers_map_type;
 
 class Response::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
+    Impl(void*) { }
+    
     void set_status_code(Response&, uint16_t code) {
         (void) code;
     }
@@ -41,6 +43,7 @@ public:
         (void) data;
     }
 };
+PIMPL_FORWARD_CONSTRUCTOR(Response, (void*), (), WiltonException)
 PIMPL_FORWARD_METHOD(Response, void, set_status_code, (uint16_t), (), WiltonException)
 PIMPL_FORWARD_METHOD(Response, void, set_status_message, (const icu::UnicodeString&), (), WiltonException)
 PIMPL_FORWARD_METHOD(Response, void, set_header, (const icu::UnicodeString&)(const icu::UnicodeString&), (), WiltonException)

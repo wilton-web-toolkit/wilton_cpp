@@ -24,6 +24,7 @@ namespace si = staticlib::icu_utils;
 
 class Logger::Impl : public staticlib::pimpl::PimplObject::Impl {
     std::string logger_name;
+    
 public:
     Impl(const icu::UnicodeString& logger_name) :
     logger_name(si::to_utf8(logger_name)) { }
