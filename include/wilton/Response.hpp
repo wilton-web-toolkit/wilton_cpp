@@ -39,8 +39,6 @@ public:
     
     void set_header(const icu::UnicodeString& name, const icu::UnicodeString& value);
     
-    std::map<icu::UnicodeString, icu::UnicodeString>& get_headers();
-    
     void send(const icu::UnicodeString& data);
 
     Response(void* /* wilton_Request* */);
