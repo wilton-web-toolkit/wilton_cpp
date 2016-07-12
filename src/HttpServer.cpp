@@ -1,11 +1,11 @@
 /* 
- * File:   Server.cpp
+ * File:   HttpServer.cpp
  * Author: alex
  * 
  * Created on June 30, 2016, 12:08 PM
  */
 
-#include "wilton/Server.hpp"
+#include "wilton/HttpServer.hpp"
 
 #include <memory>
 #include <string>
@@ -35,15 +35,15 @@ public:
 
 } // namespace
 
-class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
-    Logger logger = Logger("wilton.Server");
+class HttpServer::Impl : public staticlib::pimpl::PimplObject::Impl {
+    Logger logger = Logger("wilton.HttpServer");
     callbacks_map_type callbacks;
     std::unique_ptr<wilton_Server, ServerDeleter> ptr;
     
 public:
     Impl(const ss::JsonValue& conf, callbacks_map_type callbacks) :
     callbacks(std::move(callbacks)) { 
-        logger.info("Starting Wilton Server ...");
+        logger.info("Starting Wilton HTTP Server ...");
         std::string conf_str = ss::dump_json_to_string(conf);
         wilton_Server* srv_ptr;
         char* err = wilton_Server_create(std::addressof(srv_ptr), this, Impl::gateway_cb, 
@@ -54,14 +54,14 @@ public:
             throw WiltonException(trace);
         }
         this->ptr = std::unique_ptr<wilton_Server, ServerDeleter>(srv_ptr, ServerDeleter());        
-        logger.info("Wilton Server started successfully");
+        logger.info("Wilton HTTP Server started successfully");
     }
     
 private:
 
     static void gateway_cb(void* gateway_ctx, wilton_Request* request) STATICLIB_NOEXCEPT {
-        Logger logger = Logger("wilton.Server.gateway");
-        Server::Impl* self = static_cast<Server::Impl*> (gateway_ctx);
+        Logger logger = Logger("wilton.HttpServer.gateway");
+        HttpServer::Impl* self = static_cast<HttpServer::Impl*> (gateway_ctx);
         try {
             self->gateway_cb_internal(request);
         } catch (const std::exception& e) {
@@ -89,6 +89,6 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(Server, (const ss::JsonValue&)(callbacks_map_type), (), WiltonException)
+PIMPL_FORWARD_CONSTRUCTOR(HttpServer, (const ss::JsonValue&)(callbacks_map_type), (), WiltonException)
 
 } // namespace
