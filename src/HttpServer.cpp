@@ -29,7 +29,7 @@ using callbacks_map_type = std::map<icu::UnicodeString, std::function<void(const
 class ServerDeleter {
 public:
     void operator()(wilton_Server* server) {
-        wilton_Server_stop_server(server);
+        wilton_Server_stop(server);
     }
 };
 
@@ -43,7 +43,7 @@ class HttpServer::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
     Impl(const ss::JsonValue& conf, callbacks_map_type callbacks) :
     callbacks(std::move(callbacks)) { 
-        logger.info("Starting Wilton HTTP Server ...");
+//        logger.info("Starting Wilton HTTP Server ...");
         std::string conf_str = ss::dump_json_to_string(conf);
         wilton_Server* srv_ptr;
         char* err = wilton_Server_create(std::addressof(srv_ptr), this, Impl::gateway_cb, 

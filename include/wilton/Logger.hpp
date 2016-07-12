@@ -9,7 +9,9 @@
 #define	WILTON_LOGGER_HPP
 
 #include <unicode/unistr.h>
+
 #include "staticlib/pimpl.hpp"
+#include "staticlib/serialization/JsonValue.hpp"
 
 #include "wilton/WiltonException.hpp"
 
@@ -28,6 +30,8 @@ public:
      * @param pimpl impl object
      */
     PIMPL_CONSTRUCTOR(Logger)
+            
+    static void init_logging(const staticlib::serialization::JsonValue& conf = staticlib::serialization::JsonValue());
             
     Logger(const icu::UnicodeString& logger_name);
     

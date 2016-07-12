@@ -62,11 +62,35 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_cpp )
 
-set ( ${PROJECT_NAME}_DEPS wilton_cpp )
-staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
+set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton_cpp )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
+set ( ${PROJECT_NAME}_DEPS_PRIVATE
+        staticlib_io
+        staticlib_ranges
+        staticlib_httpserver
+        staticlib_unzip
+        staticlib_orm
+        staticlib_httpclient
+        staticlib_cron
+        staticlib_serialization
+        staticlib_utils
+        staticlib_icu
+        log4cplus
+        mstch
+        soci
+        jansson
+        libcurl
+        libssl
+        libcrypto
+        zlib 
+        sqlite3
+        wilton )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PRIVATE_PC REQUIRED ${PROJECT_NAME}_DEPS_PRIVATE )
 
 # tests
-set ( ${PROJECT_NAME}_TEST_INCLUDES ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-set ( ${PROJECT_NAME}_TEST_LIBS ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
-set ( ${PROJECT_NAME}_TEST_OPTS ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
+set ( ${PROJECT_NAME}_TEST_INCLUDES ${${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS} )
+set ( ${PROJECT_NAME}_TEST_LIBS 
+        ${${PROJECT_NAME}_DEPS_PUBLIC_PC_LIBRARIES}
+        ${${PROJECT_NAME}_DEPS_PRIVATE_PC_LIBRARIES} )
+set ( ${PROJECT_NAME}_TEST_OPTS ${${PROJECT_NAME}_DEPS_PUBLIC_PC_CFLAGS_OTHER} )
 staticlib_enable_testing ( ${PROJECT_NAME}_TEST_INCLUDES ${PROJECT_NAME}_TEST_LIBS ${PROJECT_NAME}_TEST_OPTS )
