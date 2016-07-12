@@ -80,7 +80,14 @@ private:
         }
         auto pa = callbacks.find(req.get_pathname());
         if (callbacks.end() != pa) {
-            pa->second(req, resp);
+            try {
+                pa->second(req, resp);
+            } catch(const std::exception& e) {
+                resp.set_status_code(500);
+                resp.set_status_message("Internal Server Error");
+                auto msg = icu::UnicodeString::fromUTF8(e.what());
+                resp.send(UTRACEMSG(msg));
+            }
         } else {
             resp.set_status_code(404);
             resp.set_status_message("Not Found");
