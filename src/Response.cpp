@@ -67,7 +67,7 @@ public:
         if (nullptr != err1) {
             std::string trace = TRACEMSG(err1);
             wilton_free(err1);
-            throw WiltonException(err1);
+            throw WiltonException(trace);
         }
         
         // data
@@ -76,7 +76,7 @@ public:
         if (nullptr != err2) {
             std::string trace = TRACEMSG(err2);
             wilton_free(err2);
-            throw WiltonException(err2);
+            throw WiltonException(trace);
         }
     }
 };

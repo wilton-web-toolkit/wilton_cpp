@@ -19,17 +19,18 @@ namespace siu = staticlib::icu_utils;
 namespace ss = staticlib::serialization;
 
 void test_execute() {
-    auto conf = ss::JsonValue({
+    auto server = wilton::HttpServer({
         {"numberOfThreads", 1},
         {"tcpPort", 8080},
+    }, 
+    {
+        { "/hello",
+            [](const wilton::Request& req, wilton::Response & resp) {
+                (void) req;
+                resp.send("hi!");
+            }
+        }
     });
-    auto map = std::map<icu::UnicodeString, std::function<void(const wilton::Request& req, wilton::Response& resp)>>();
-    auto fun = [](const wilton::Request& req, wilton::Response& resp) {
-        (void) req;
-        resp.send("hi!");
-    };
-    map.insert(std::make_pair("/hello", fun));
-    auto server = wilton::HttpServer(conf, map);
     auto client = wilton::HttpClient();
     icu::UnicodeString res = client.execute("http://127.0.0.1:8080/hello");
     std::cout << siu::to_utf8(res) << std::endl;
