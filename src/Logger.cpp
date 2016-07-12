@@ -33,16 +33,32 @@ public:
         log("DEBUG", message);
     }
 
+    bool is_debug_enabled(Logger&) {
+        return is_level_enabled("DEBUG");
+    }
+
     void info(Logger&, const icu::UnicodeString& message) {
         log("INFO", message);
+    }
+
+    bool is_info_enabled(Logger&) {
+        return is_level_enabled("INFO");
     }
 
     void warn(Logger&, const icu::UnicodeString& message) {
         log("WARN", message);
     }
 
+    bool is_warn_enabled(Logger&) {
+        return is_level_enabled("WARN");
+    }
+    
     void error(Logger&, const icu::UnicodeString& message) {
         log("ERROR", message);
+    }
+
+    bool is_error_enabled(Logger&) {
+        return is_level_enabled("ERROR");
     }
     
 private:
@@ -58,11 +74,27 @@ private:
         }
     }
     
+    bool is_level_enabled(std::string level) {
+        int res = -1;
+        char* err = wilton_log_is_level_enabled(logger_name.c_str(), logger_name.length(),
+                level.c_str(), level.length(), std::addressof(res));
+        if (nullptr != err) {
+            std::string trace = TRACEMSG(err);
+            wilton_free(err);
+            throw WiltonException(trace);
+        }
+        return 1 == res;
+    }
+    
 };
 PIMPL_FORWARD_CONSTRUCTOR(Logger, (const icu::UnicodeString&), (), WiltonException)
 PIMPL_FORWARD_METHOD(Logger, void, debug, (const icu::UnicodeString&), (), WiltonException)
+PIMPL_FORWARD_METHOD(Logger, bool, is_debug_enabled, (), (), WiltonException)
 PIMPL_FORWARD_METHOD(Logger, void, info, (const icu::UnicodeString&), (), WiltonException)
+PIMPL_FORWARD_METHOD(Logger, bool, is_info_enabled, (), (), WiltonException)
 PIMPL_FORWARD_METHOD(Logger, void, warn, (const icu::UnicodeString&), (), WiltonException)
+PIMPL_FORWARD_METHOD(Logger, bool, is_warn_enabled, (), (), WiltonException)
 PIMPL_FORWARD_METHOD(Logger, void, error, (const icu::UnicodeString&), (), WiltonException)
-
+PIMPL_FORWARD_METHOD(Logger, bool, is_error_enabled, (), (), WiltonException)
+        
 } // namespace

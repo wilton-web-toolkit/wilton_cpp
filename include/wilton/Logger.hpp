@@ -33,11 +33,19 @@ public:
     
     void debug(const icu::UnicodeString& message);
     
+    bool is_debug_enabled();
+    
     void info(const icu::UnicodeString& message);
+    
+    bool is_info_enabled();
     
     void warn(const icu::UnicodeString& message);
     
+    bool is_warn_enabled();
+    
     void error(const icu::UnicodeString& message);
+        
+    bool is_error_enabled();
 
 };
 

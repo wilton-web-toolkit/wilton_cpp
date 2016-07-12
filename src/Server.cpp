@@ -43,6 +43,7 @@ class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
     Impl(const ss::JsonValue& conf, callbacks_map_type callbacks) :
     callbacks(std::move(callbacks)) { 
+        logger.info("Starting Wilton Server ...");
         std::string conf_str = ss::dump_json_to_string(conf);
         wilton_Server* srv_ptr;
         char* err = wilton_Server_create(std::addressof(srv_ptr), this, Impl::gateway_cb, 
@@ -52,7 +53,8 @@ public:
             wilton_free(err);
             throw WiltonException(trace);
         }
-        this->ptr = std::unique_ptr<wilton_Server, ServerDeleter>(srv_ptr, ServerDeleter());
+        this->ptr = std::unique_ptr<wilton_Server, ServerDeleter>(srv_ptr, ServerDeleter());        
+        logger.info("Wilton Server started successfully");
     }
     
 private:
@@ -69,9 +71,13 @@ private:
         }
     }
     
-    void gateway_cb_internal(wilton_Request* request) {
+    void gateway_cb_internal(wilton_Request* request) {        
         Request req(request);
         Response resp(request);
+        if (logger.is_debug_enabled()) {
+            logger.debug(UTRACEMSG("Receiving request, path: [" + req.get_pathname() + "]," +
+            " method: [" + req.get_method() + "]"));
+        }
         auto pa = callbacks.find(req.get_pathname());
         if (callbacks.end() != pa) {
             pa->second(req, resp);
