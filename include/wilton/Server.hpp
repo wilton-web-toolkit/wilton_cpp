@@ -36,8 +36,6 @@ public:
             
     Server(const staticlib::serialization::JsonValue& conf, 
             std::map<icu::UnicodeString, std::function<void(const Request& req, Response& resp)>> callbacks);
-
-    void stop();
 };
 
 } // namespace

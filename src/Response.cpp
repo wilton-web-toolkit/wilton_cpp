@@ -13,6 +13,7 @@
 
 #include "staticlib/icu_utils.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 #include "wilton/wilton.h"
 
@@ -20,9 +21,10 @@ namespace wilton {
 
 namespace { // anonymous
 
-typedef std::map<icu::UnicodeString, icu::UnicodeString>& headers_map_type;
+using headers_map_type = std::map<icu::UnicodeString, icu::UnicodeString>&;
 
 namespace si = staticlib::icu_utils;
+namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -51,10 +53,10 @@ public:
 
     void send(Response&, const icu::UnicodeString& data) {
         // metadata
-        std::vector<ss::JsonField> vec;
-        for (auto& pa : headers) {
-            vec.emplace_back(ss::JsonField{pa.first, pa.second});
-        }
+        auto ra = sr::transform(sr::refwrap(headers), [](std::pair<const std::string, std::string>& pa) {
+            return ss::JsonField{pa.first, pa.second};
+        });
+        auto vec = sr::emplace_to_vector(std::move(ra));
         ss::JsonValue json = {
             {"statusCode", code},
             {"statusMessage", message},

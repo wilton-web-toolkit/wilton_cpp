@@ -22,7 +22,7 @@ namespace io = staticlib::io;
 namespace si = staticlib::icu_utils;
 namespace ss = staticlib::serialization;
 
-typedef const std::map<icu::UnicodeString, icu::UnicodeString>& headers_map_type;
+using headers_map_type = const std::map<icu::UnicodeString, icu::UnicodeString>&;
 
 } // namespace
 
