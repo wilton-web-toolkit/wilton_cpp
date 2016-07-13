@@ -69,6 +69,7 @@ int main() {
     try {
         test_execute();
         test_send_file();
+        
         u_cleanup();
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
