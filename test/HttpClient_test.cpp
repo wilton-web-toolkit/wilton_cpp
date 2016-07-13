@@ -25,17 +25,16 @@ void test_execute() {
     }, 
     {
         { "/hello",
-            [](const wilton::Request& req, wilton::Response & resp) {
+            [](const wilton::Request& req, wilton::Response& resp) {
                 (void) req;
                 resp.send("hi!");
             }
         }
     });
     auto client = wilton::HttpClient();
-    icu::UnicodeString res = client.execute("http://127.0.0.1:8080/hello");
-    std::cout << siu::to_utf8(res) << std::endl;
-    // todo
-//    slassert(res == "hi!");
+    auto res = client.execute("http://127.0.0.1:8080/hello");
+    std::cout << siu::to_utf8(res.data) << std::endl;
+    slassert(res.data == "hi!");
 }
 
 void test_send_file() {

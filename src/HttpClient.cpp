@@ -11,6 +11,7 @@
 #include <string>
 
 #include "staticlib/icu_utils.hpp"
+#include "staticlib/io.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
 
@@ -22,6 +23,7 @@ namespace wilton {
 namespace { // anonymous
 
 namespace ss = staticlib::serialization;
+namespace sio = staticlib::io;
 namespace siu = staticlib::icu_utils;
 
 using finalizer_type = std::function<void(bool)>;
@@ -51,7 +53,7 @@ public:
         this->ptr = std::unique_ptr<wilton_HttpClient, ClientDeleter>(client_ptr, ClientDeleter());        
     }
 
-    icu::UnicodeString execute(HttpClient&, const icu::UnicodeString& url,
+    ClientResponse execute(HttpClient&, const icu::UnicodeString& url,
             const icu::UnicodeString& data, const ss::JsonValue& metadata) {
         std::string url_str = siu::to_utf8(url);
         std::string data_str = siu::to_utf8(data);
@@ -66,10 +68,12 @@ public:
             wilton_free(err);
             throw WiltonException(trace);
         }
-        return icu::UnicodeString::fromUTF8(icu::StringPiece(out, out_len));
+        auto src = sio::array_source(out, out_len);
+        ss::JsonValue json = ss::load_json(src);
+        return ClientResponse(std::move(json));
     }
 
-    icu::UnicodeString send_file(HttpClient&, const icu::UnicodeString& url, 
+    ClientResponse send_file(HttpClient&, const icu::UnicodeString& url, 
             const icu::UnicodeString& file_path, const ss::JsonValue& metadata,
             finalizer_type finalizer) {
         std::string url_str = siu::to_utf8(url);
@@ -86,7 +90,9 @@ public:
             wilton_free(err);
             throw WiltonException(trace);
         }
-        return icu::UnicodeString::fromUTF8(icu::StringPiece(out, out_len));
+        auto src = sio::array_source(out, out_len);
+        ss::JsonValue json = ss::load_json(src);
+        return ClientResponse(std::move(json));
     }
     
 private:
@@ -107,9 +113,9 @@ private:
     
 };
 PIMPL_FORWARD_CONSTRUCTOR(HttpClient, (const ss::JsonValue&), (), WiltonException)
-PIMPL_FORWARD_METHOD(HttpClient, icu::UnicodeString, execute, (const icu::UnicodeString&)
+PIMPL_FORWARD_METHOD(HttpClient, ClientResponse, execute, (const icu::UnicodeString&)
         (const icu::UnicodeString&)(const ss::JsonValue&), (), WiltonException)
-PIMPL_FORWARD_METHOD(HttpClient, icu::UnicodeString, send_file, (const icu::UnicodeString&)
+PIMPL_FORWARD_METHOD(HttpClient, ClientResponse, send_file, (const icu::UnicodeString&)
         (const icu::UnicodeString&)(const ss::JsonValue&)(finalizer_type), (), WiltonException)        
 
 } // namespace

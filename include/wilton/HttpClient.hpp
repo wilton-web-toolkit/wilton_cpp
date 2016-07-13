@@ -14,6 +14,7 @@
 #include "staticlib/serialization/JsonValue.hpp"
 #include "staticlib/pimpl.hpp"
 
+#include "wilton/ClientResponse.hpp"
 #include "wilton/WiltonException.hpp"
 
 namespace wilton {
@@ -34,11 +35,11 @@ public:
 
     HttpClient(const staticlib::serialization::JsonValue& conf = staticlib::serialization::JsonValue());
     
-    icu::UnicodeString execute(const icu::UnicodeString& url,
+    ClientResponse execute(const icu::UnicodeString& url,
             const icu::UnicodeString& data = icu::UnicodeString(), 
             const staticlib::serialization::JsonValue& metadata = staticlib::serialization::JsonValue());
     
-    icu::UnicodeString send_file(const icu::UnicodeString& url, const icu::UnicodeString& file_path,
+    ClientResponse send_file(const icu::UnicodeString& url, const icu::UnicodeString& file_path,
             const staticlib::serialization::JsonValue& metadata = staticlib::serialization::JsonValue(),
             std::function<void(bool)> finalizer = [](bool){});
 };
