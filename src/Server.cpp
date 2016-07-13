@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 
+#include <unicode/locid.h>
+
 #include "staticlib/icu_utils.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
@@ -78,7 +80,10 @@ private:
             logger.debug(UTRACEMSG("Receiving request, path: [" + req.get_pathname() + "]," +
             " method: [" + req.get_method() + "]"));
         }
-        auto pa = callbacks.find(req.get_pathname());
+        icu::UnicodeString path_str = req.get_pathname();
+        iu::ustr_ptr path{path_str};
+        path->toLower(icu::Locale::getEnglish());
+        auto pa = callbacks.find(path.get());
         if (callbacks.end() != pa) {
             try {
                 pa->second(req, resp);
