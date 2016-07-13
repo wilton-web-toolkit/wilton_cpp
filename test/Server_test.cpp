@@ -113,71 +113,59 @@ void test_simple() {
 
 void test_logging() {
     icu::UnicodeString logfile = "Server_test_logging.log";
-    // json literal workaround below for the "list of maps" case
-    // appenders    
-    std::vector<ss::JsonValue> appenders;
-    {
-        std::vector<ss::JsonField> ap1;
-        ap1.emplace_back("appenderType", "FILE");
-        ap1.emplace_back("thresholdLevel", "DEBUG");
-        ap1.emplace_back("filePath", logfile);
-        ap1.emplace_back("layout", "%m");
-        appenders.emplace_back(std::move(ap1));
-    }
-    // loggers
-    std::vector<ss::JsonValue> loggers;
-    {
-        std::vector<ss::JsonField> lo1;
-        lo1.emplace_back("name", "staticlib.httpserver");
-        lo1.emplace_back("level", "WARN");
-        loggers.emplace_back(std::move(lo1));
-        std::vector<ss::JsonField> lo2;
-        lo2.emplace_back("name", "wilton");
-        lo2.emplace_back("level", "WARN");
-        loggers.emplace_back(std::move(lo2));
-        std::vector<ss::JsonField> lo3;
-        lo3.emplace_back("name", "test");
-        lo3.emplace_back("level", "INFO");
-        loggers.emplace_back(std::move(lo3));
-    }
     // server
-    auto server = wilton::Server({
-        {"tcpPort", TCP_PORT},
-        {"logging",
+    auto server = wilton::Server(ss::load_json_from_ustring(R"(
+{
+    "tcpPort": )" + iu::to_ustring(TCP_PORT) + R"(,
+    "logging": {
+        "appenders": [
             {
-                {"appenders", std::move(appenders)},
-                {"loggers", std::move(loggers)}
+                "appenderType": "FILE",
+                "thresholdLevel": "DEBUG",
+                "filePath": ")" + logfile + R"(",
+                "layout": "%m"
             }
-        }
-    }, create_handlers());
+        ],
+        "loggers": [
+            {
+                "name": "staticlib.httpserver",
+                "level": "WARN"
+            }, {
+                "name": "wilton",
+                "level": "WARN"
+            }, {
+                "name": "test",
+                "level": "INFO"
+            }
+        ]
+    }
+})"), create_handlers());
     slassert(ROOT_RESP == http_get(ROOT_URL));
     http_post(ROOT_URL + "logger", LOG_DATA);
     slassert(LOG_DATA == read_file_to_string(logfile));
 }
 
 void test_document_root() {
-    std::vector<ss::JsonValue> document_roots;
-    {
-        std::vector<ss::JsonField> dr1;
-        dr1.emplace_back("resource", "/static/files/");
-        dr1.emplace_back("dirPath", "../test/static/");
-        std::vector<ss::JsonValue> mime_types;
-        std::vector<ss::JsonField> mt1;
-        mt1.emplace_back("extension", "boo");
-        mt1.emplace_back("mime", "text/x-boo");
-        mime_types.emplace_back(std::move(mt1));
-        dr1.emplace_back("mimeTypes", std::move(mime_types));
-        document_roots.emplace_back(std::move(dr1));
-        std::vector<ss::JsonField> dr2;
-        dr2.emplace_back("resource", "/static/");
-        dr2.emplace_back("zipPath", "../test/static/test.zip");
-        dr2.emplace_back("zipInnerPrefix", "test/");
-        document_roots.emplace_back(std::move(dr2));
-    }
-    auto server = wilton::Server({
-        {"tcpPort", TCP_PORT},
-        {"documentRoots", std::move(document_roots)}
-    }, create_handlers());
+    auto server = wilton::Server(ss::load_json_from_ustring(R"( 
+{
+    "tcpPort": )" + iu::to_ustring(TCP_PORT) + R"(,
+    "documentRoots": [
+        {
+            "resource": "/static/files/",
+            "dirPath": "../test/static/",
+            "mimeTypes": [
+                {
+                    "extension": "boo",
+                    "mime": "text/x-boo"
+                }
+            ]
+        }, {
+            "resource": "/static/",
+            "zipPath": "../test/static/test.zip",
+            "zipInnerPrefix": "test/"
+        }
+    ]
+})"), create_handlers());
     slassert(ROOT_RESP == http_get(ROOT_URL));
     // deliberated repeated requests
     slassert(STATIC_FILE_DATA == http_get(ROOT_URL + "static/files/test.txt"));
