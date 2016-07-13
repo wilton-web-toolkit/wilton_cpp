@@ -29,6 +29,8 @@ namespace su = staticlib::utils;
 
 const uint16_t TCP_PORT = 8080;
 const icu::UnicodeString ROOT_URL = "http://127.0.0.1:" + iu::to_ustring(TCP_PORT) + "/";
+const uint16_t TCP_PORT_HTTPS = 8443;
+const icu::UnicodeString ROOT_URL_HTTPS = "https://127.0.0.1:" + iu::to_ustring(TCP_PORT_HTTPS) + "/";
 const icu::UnicodeString ROOT_RESP = "Hello C++!\n";
 const icu::UnicodeString LOG_DATA = "Please append me to log";
 const icu::UnicodeString STATIC_FILE_DATA = "I am data from static file\n";
@@ -233,7 +235,29 @@ void test_headers() {
 }
 
 void test_https() {
-    // todo
+    auto server = wilton::Server({
+        {"tcpPort", TCP_PORT_HTTPS},
+        {"ssl",
+            {
+                {"keyFile", "../test/certificates/server/localhost.pem"},
+                {"keyPassword", "test"},
+                {"verifyFile", "../test/certificates/server/staticlibs_test_ca.cer"},
+                {"verifySubjectSubstr", "CN=testclient"}
+            }
+        },
+    }, create_handlers());
+    auto resp = HTTP.execute(ROOT_URL_HTTPS, "", {
+        {"method", "GET"},
+        {"sslcertFilename", "../test/certificates/client/testclient.cer"},
+        {"sslcertype", "PEM"},
+        {"sslkeyFilename", "../test/certificates/client/testclient.key"},
+        {"sslKeyType", "PEM"},
+        {"sslKeypasswd", "test"},
+        {"sslVerifyhost", true},
+        {"sslVerifypeer", true},
+        {"cainfoFilename", "../test/certificates/client/staticlibs_test_ca.cer"}
+    });
+    slassert(ROOT_RESP == resp.data);
 }
 
 void test_request_data_file() {
