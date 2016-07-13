@@ -57,6 +57,20 @@ std::map<icu::UnicodeString, std::function<void(const wilton::Request&, wilton::
             [](const wilton::Request& req, wilton::Response& /* resp */) {
                 LOGGER.info(req.get_data());
             }
+        },
+        {
+            "/headers",
+            [](const wilton::Request& req, wilton::Response& resp) {
+                std::vector<ss::JsonField> body;
+                for (const auto& pa : req.get_headers()) {
+                    body.emplace_back(pa.first, pa.second);
+                }
+                resp.set_header("X-Server-H1", "foo");
+                resp.set_header("X-Server-H2", "bar");
+                resp.set_header("X-Proto", "http");
+                icu::UnicodeString body_str = ss::dump_json_to_ustring(std::move(body));
+                resp.send(body_str);
+            }
         }
     };
 }
@@ -180,7 +194,36 @@ void test_document_root() {
 }
 
 void test_headers() {
-    // todo
+    auto server = wilton::Server({
+        {"tcpPort", TCP_PORT}
+    }, create_handlers());
+    
+    slassert(ROOT_RESP == http_get(ROOT_URL));
+    auto resp = HTTP.execute(ROOT_URL + "headers", "", {
+        {"method", "GET"},
+        {"headers", {
+                {"X-Dupl-H", "foo"},
+                {"Referer", "foo"},
+                {"referer", "bar"}
+            }
+        }
+    });
+    
+    auto client_headers = ss::load_json_from_ustring(resp.data);
+    slassert("foo" == client_headers.getu("X-Dupl-H").get_ustring());
+    slassert(ss::JsonType::STRING == client_headers.getu("referer").get_type() || 
+            ss::JsonType::STRING == client_headers.getu("Referer").get_type());
+    if (ss::JsonType::STRING == client_headers.getu("referer").get_type()) {
+        slassert("bar" == client_headers.getu("referer").get_ustring());
+    } else {
+        slassert("foo" == client_headers.getu("Referer").get_ustring());
+    }
+    auto h1 = resp.headers.find("X-Server-H1");
+    slassert(resp.headers.end() != h1 && "foo" == h1->second);
+    auto h2 = resp.headers.find("X-Server-H2");
+    slassert(resp.headers.end() != h2 && "bar" == h2->second);
+    auto xp = resp.headers.find("X-Proto");
+    slassert(resp.headers.end() != xp && "http" == xp->second);
 }
 
 void test_https() {

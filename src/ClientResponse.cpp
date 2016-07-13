@@ -8,12 +8,14 @@
 #include "wilton/ClientResponse.hpp"
 
 #include "staticlib/icu_utils.hpp"
+#include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
 namespace wilton {
 
 namespace { // anonymous
 
+namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -66,6 +68,37 @@ ClientResponse::ClientResponse(const staticlib::serialization::JsonValue& resp) 
             this->primary_port = fi.get_uint16();
         }
     }
+}
+
+ss::JsonValue ClientResponse::to_json() {
+    auto ra = sr::transform(sr::refwrap(headers), [](const std::pair<const icu::UnicodeString, icu::UnicodeString>& pa) {
+        return ss::JsonField{pa.first, pa.second};
+    });
+    auto vec = sr::emplace_to_vector(std::move(ra));
+    
+    return {
+        {"headers", std::move(vec)},
+        {"data", data},
+        {"effectiveUrl", effective_url},
+        {"responseCode", response_code},
+        {"totalTimeSecs", total_time_secs},
+        {"namelookupTimeSecs", namelookup_time_secs},
+        {"connectTimeSecs", connect_time_secs},
+        {"appconnectTimeSecs", appconnect_time_secs},
+        {"pretransferTimeSecs", pretransfer_time_secs},
+        {"starttransferTimeSecs", starttransfer_time_secs},
+        {"redirectTimeSecs", redirect_time_secs},
+        {"redirectCount", redirect_count},
+        {"speedDownloadBytesSecs", speed_download_bytes_secs},
+        {"speedUploadBytesSecs", speed_upload_bytes_secs},
+        {"headerSizeBytes", header_size_bytes},
+        {"requestSizeBytes", request_size_bytes},
+        {"sslVerifyresult", ssl_verifyresult},
+        {"osErrno", os_errno},
+        {"numConnects", num_connects},
+        {"primaryIp", primary_ip},
+        {"primaryPort", primary_port}
+    };
 }
 
 } // namespace

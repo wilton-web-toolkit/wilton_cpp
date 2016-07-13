@@ -43,6 +43,8 @@ struct ClientResponse {
     
     ClientResponse(const staticlib::serialization::JsonValue& resp);
     
+    staticlib::serialization::JsonValue to_json();
+    
 };
 
 } // namespace
