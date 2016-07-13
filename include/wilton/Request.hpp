@@ -47,6 +47,8 @@ public:
     
     icu::UnicodeString get_data() const;
     
+    icu::UnicodeString get_data_filename() const;
+    
     Request(void* /* wilton_Request* */);
     
 };

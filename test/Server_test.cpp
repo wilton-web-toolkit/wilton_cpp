@@ -71,6 +71,12 @@ std::map<icu::UnicodeString, std::function<void(const wilton::Request&, wilton::
                 icu::UnicodeString body_str = ss::dump_json_to_ustring(std::move(body));
                 resp.send(body_str);
             }
+        },
+        {
+            "/reqfilename",
+            [](const wilton::Request& req, wilton::Response& resp) {
+                resp.send(req.get_data_filename());
+            }
         }
     };
 }
@@ -231,7 +237,29 @@ void test_https() {
 }
 
 void test_request_data_file() {
-    // todo
+    auto server = wilton::Server(ss::load_json_from_ustring(R"( 
+{
+    "tcpPort": )" + iu::to_ustring(TCP_PORT) + R"(,
+    "requestPayload": {
+        "tmpDirPath": ".",
+        "tmpFilenameLength": 32,
+        "memoryLimitBytes": 4
+    }
+})"), create_handlers());
+    
+    slassert(ROOT_RESP == http_get(ROOT_URL));
+    { // direct writer
+        icu::UnicodeString filename = http_post(ROOT_URL + "reqfilename", "foobar");
+        slassert(filename.length() >= 34);
+        icu::UnicodeString posted = http_post(ROOT_URL + "postmirror", "foobar");
+        slassert("foobar" == posted);
+    }
+    { // on-demand writer
+        icu::UnicodeString filename = http_post(ROOT_URL + "reqfilename", "foo");
+        slassert(filename.length() >= 34);
+        icu::UnicodeString posted = http_post(ROOT_URL + "postmirror", "foobar");
+        slassert("foobar" == posted);
+    }
 }
 
 int main() {

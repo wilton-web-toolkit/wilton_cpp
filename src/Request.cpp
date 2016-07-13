@@ -130,6 +130,27 @@ public:
         }
     }
     
+    icu::UnicodeString get_data_filename(const Request&) const {
+        char* filename;
+        int filename_len;
+        char* err = wilton_Request_get_request_data_filename(this->ptr, std::addressof(filename), 
+                std::addressof(filename_len));
+        if (nullptr != err) {
+            std::string trace = TRACEMSG(err);
+            wilton_free(err);
+            throw WiltonException(trace);
+        }
+        try {
+            auto sink = si::ustring_sink();
+            io::write_all(sink, filename, filename_len);
+            wilton_free(filename);
+            filename = nullptr;
+            return sink.get_string();
+        } catch (...) {
+            wilton_free(filename);
+            throw;
+        }
+    }
 };
 PIMPL_FORWARD_CONSTRUCTOR(Request, (void*), (), WiltonException)
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_http_version, (), (const), WiltonException)
@@ -140,5 +161,6 @@ PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_quiery, (), (const)
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_url, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, headers_map_type, get_headers, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, icu::UnicodeString, get_data, (), (const), WiltonException)
+PIMPL_FORWARD_METHOD(Request, icu::UnicodeString, get_data_filename, (), (const), WiltonException)
 
 } // namespace
