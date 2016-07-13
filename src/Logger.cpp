@@ -19,7 +19,7 @@ namespace wilton {
 
 namespace { // anonymous
 
-namespace si = staticlib::icu_utils;
+namespace iu = staticlib::icu_utils;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -29,7 +29,7 @@ class Logger::Impl : public staticlib::pimpl::PimplObject::Impl {
     
 public:
     Impl(const icu::UnicodeString& logger_name) :
-    logger_name(si::to_utf8(logger_name)) { }
+    logger_name(iu::to_utf8(logger_name)) { }
     
     static void init_logging(const ss::JsonValue& conf) {
         std::string conf_str = ss::dump_json_to_string(conf);
@@ -75,7 +75,7 @@ public:
     
 private:
     void log(std::string level, const icu::UnicodeString& message) {
-        std::string str = si::to_utf8(message);
+        std::string str = iu::to_utf8(message);
         char* err = wilton_logger_log(level.c_str(), level.length(), 
                 logger_name.c_str(), logger_name.length(), 
                 str.c_str(), str.length());

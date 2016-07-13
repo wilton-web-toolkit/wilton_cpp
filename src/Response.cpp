@@ -23,7 +23,7 @@ namespace { // anonymous
 
 using headers_map_type = std::map<icu::UnicodeString, icu::UnicodeString>&;
 
-namespace si = staticlib::icu_utils;
+namespace iu = staticlib::icu_utils;
 namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
@@ -44,11 +44,11 @@ public:
     }
 
     void set_status_message(Response&, const icu::UnicodeString& message) {
-        this->message = si::to_utf8(message);
+        this->message = iu::to_utf8(message);
     }
 
     void set_header(Response&, const icu::UnicodeString& name, const icu::UnicodeString& value) {
-        headers.insert(std::make_pair(si::to_utf8(name), si::to_utf8(value)));
+        headers.insert(std::make_pair(iu::to_utf8(name), iu::to_utf8(value)));
     }
 
     void send(Response&, const icu::UnicodeString& data) {
@@ -71,7 +71,7 @@ public:
         }
         
         // data
-        std::string data_str = si::to_utf8(data);
+        std::string data_str = iu::to_utf8(data);
         char* err2 = wilton_Request_send_response(ptr, data_str.c_str(), data_str.length());
         if (nullptr != err2) {
             std::string trace = TRACEMSG(err2);

@@ -23,8 +23,8 @@ namespace wilton {
 namespace { // anonymous
 
 namespace ss = staticlib::serialization;
-namespace sio = staticlib::io;
-namespace siu = staticlib::icu_utils;
+namespace io = staticlib::io;
+namespace iu = staticlib::icu_utils;
 
 using finalizer_type = std::function<void(bool)>;
 
@@ -55,8 +55,8 @@ public:
 
     ClientResponse execute(HttpClient&, const icu::UnicodeString& url,
             const icu::UnicodeString& data, const ss::JsonValue& metadata) {
-        std::string url_str = siu::to_utf8(url);
-        std::string data_str = siu::to_utf8(data);
+        std::string url_str = iu::to_utf8(url);
+        std::string data_str = iu::to_utf8(data);
         std::string metadata_str = ss::dump_json_to_string(metadata);
         char* out;
         int out_len;
@@ -68,16 +68,17 @@ public:
             wilton_free(err);
             throw WiltonException(trace);
         }
-        auto src = sio::array_source(out, out_len);
+        auto src = io::array_source(out, out_len);
         ss::JsonValue json = ss::load_json(src);
+        wilton_free(out);
         return ClientResponse(std::move(json));
     }
 
     ClientResponse send_file(HttpClient&, const icu::UnicodeString& url, 
             const icu::UnicodeString& file_path, const ss::JsonValue& metadata,
             finalizer_type finalizer) {
-        std::string url_str = siu::to_utf8(url);
-        std::string file_path_str = siu::to_utf8(file_path);
+        std::string url_str = iu::to_utf8(url);
+        std::string file_path_str = iu::to_utf8(file_path);
         std::string metadata_str = ss::dump_json_to_string(metadata);
         char* out;
         int out_len;
@@ -90,8 +91,9 @@ public:
             wilton_free(err);
             throw WiltonException(trace);
         }
-        auto src = sio::array_source(out, out_len);
+        auto src = io::array_source(out, out_len);
         ss::JsonValue json = ss::load_json(src);
+        wilton_free(out);
         return ClientResponse(std::move(json));
     }
     

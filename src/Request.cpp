@@ -112,7 +112,7 @@ public:
     icu::UnicodeString get_data(const Request&) const {
         char* data;
         int data_len;
-        char* err = wilton_Request_get_request_metadata(this->ptr, std::addressof(data), std::addressof(data_len));
+        char* err = wilton_Request_get_request_data(this->ptr, std::addressof(data), std::addressof(data_len));
         if (nullptr != err) {
             std::string trace = TRACEMSG(err);
             wilton_free(err);

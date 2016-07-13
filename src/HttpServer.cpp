@@ -21,7 +21,7 @@ namespace wilton {
 
 namespace { // anonymous
 
-namespace siu = staticlib::icu_utils;
+namespace iu = staticlib::icu_utils;
 namespace ss = staticlib::serialization;
 
 using callbacks_map_type = std::map<icu::UnicodeString, std::function<void(const Request&, Response&)>>;
