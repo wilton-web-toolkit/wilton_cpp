@@ -1,11 +1,11 @@
 /* 
- * File:   HttpServer.cpp
+ * File:   Server.cpp
  * Author: alex
  * 
  * Created on June 30, 2016, 12:08 PM
  */
 
-#include "wilton/HttpServer.hpp"
+#include "wilton/Server.hpp"
 
 #include <memory>
 #include <string>
@@ -35,8 +35,8 @@ public:
 
 } // namespace
 
-class HttpServer::Impl : public staticlib::pimpl::PimplObject::Impl {
-    Logger logger = Logger("wilton.HttpServer");
+class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
+    Logger logger = Logger("wilton.Server");
     callbacks_map_type callbacks;
     std::unique_ptr<wilton_Server, ServerDeleter> ptr;
     
@@ -60,8 +60,8 @@ public:
 private:
 
     static void gateway_cb(void* gateway_ctx, wilton_Request* request) STATICLIB_NOEXCEPT {
-        Logger logger = Logger("wilton.HttpServer.gateway");
-        HttpServer::Impl* self = static_cast<HttpServer::Impl*> (gateway_ctx);
+        Logger logger = Logger("wilton.Server.gateway");
+        Server::Impl* self = static_cast<Server::Impl*> (gateway_ctx);
         try {
             self->gateway_cb_internal(request);
         } catch (const std::exception& e) {
@@ -96,6 +96,6 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(HttpServer, (const ss::JsonValue&)(callbacks_map_type), (), WiltonException)
+PIMPL_FORWARD_CONSTRUCTOR(Server, (const ss::JsonValue&)(callbacks_map_type), (), WiltonException)
 
 } // namespace

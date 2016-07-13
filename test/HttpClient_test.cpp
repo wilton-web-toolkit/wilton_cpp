@@ -17,15 +17,15 @@
 #include "staticlib/icu_utils.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
-#include "wilton/HttpServer.hpp"
+#include "wilton/Server.hpp"
 
 namespace iu = staticlib::icu_utils;
 namespace io = staticlib::io;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
-wilton::HttpServer create_server() {
-    return wilton::HttpServer({
+wilton::Server create_server() {
+    return wilton::Server({
         {"numberOfThreads", 1},
         {"tcpPort", 8080},
     },

@@ -1,11 +1,11 @@
 /* 
- * File:   HttpServer_test.cpp
+ * File:   Server_test.cpp
  * Author: alex
  *
  * Created on June 30, 2016, 12:03 PM
  */
 
-#include "wilton/HttpServer.hpp"
+#include "wilton/Server.hpp"
 
 #include <iostream>
 
