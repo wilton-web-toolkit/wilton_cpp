@@ -21,6 +21,17 @@ set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit C++ library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_cpp )
 include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
 
+# check deplibs cache
+if ( STATICLIB_USE_DEPLIBS_CACHE )
+    set ( ${PROJECT_NAME}_CACHED_LIB_PATH ${STATICLIB_DEPLIBS_CACHE_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} )
+    if ( EXISTS ${${PROJECT_NAME}_CACHED_LIB_PATH} )
+        add_library( ${PROJECT_NAME} STATIC IMPORTED GLOBAL )
+        set_target_properties( ${PROJECT_NAME} PROPERTIES IMPORTED_LOCATION ${${PROJECT_NAME}_CACHED_LIB_PATH} )
+        message ( STATUS "Using cached library: [${${PROJECT_NAME}_CACHED_LIB_PATH}]" )
+        return ( )
+    endif ( )
+endif ( )
+
 # options
 set ( STATICLIB_WITH_ICU ON CACHE BOOL "Build with ICU support" )
 set ( staticlib_httpserver_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
@@ -96,7 +107,7 @@ wilton_cpp_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PRIVATE_PC REQUIRED ${PROJEC
 
 # build steps
 file ( GLOB_RECURSE ${PROJECT_NAME}_SRC ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp )
-file ( GLOB_RECURSE ${PROJECT_HEADERS}_SRC ${CMAKE_CURRENT_LIST_DIR}/include/*.hpp )
+file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/*.hpp )
 file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS_PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/*.hpp )
 
 add_library ( ${PROJECT_NAME} STATIC
