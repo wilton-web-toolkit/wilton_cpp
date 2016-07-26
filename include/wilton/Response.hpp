@@ -39,7 +39,7 @@ public:
     
     void set_header(const icu::UnicodeString& name, const icu::UnicodeString& value);
     
-    void send(const icu::UnicodeString& data);
+    void send(const icu::UnicodeString& data = icu::UnicodeString());
     
     void send_file(const icu::UnicodeString& filepath, 
             std::function<void(bool)> finalizer = [](bool) {});
