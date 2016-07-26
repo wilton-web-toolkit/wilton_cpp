@@ -79,6 +79,12 @@ std::map<icu::UnicodeString, std::function<void(const wilton::Request&, wilton::
             [](const wilton::Request& req, wilton::Response& resp) {
                 resp.send(req.get_data_filename());
             }
+        },
+        {
+            "/sendfile",
+            [](const wilton::Request& /*req*/, wilton::Response& resp) {
+                resp.send_file("../test/static/test.txt");
+            }
         }
     };
 }
@@ -103,7 +109,9 @@ icu::UnicodeString http_get_header(const icu::UnicodeString& url, const icu::Uni
 
 icu::UnicodeString http_post(const icu::UnicodeString& url, const icu::UnicodeString& data) {
     auto res = HTTP.execute(url, data, {
-        {"method", "POST"}
+        {"method", "POST"},
+        // todo: investigate me
+        {"forceHttp10", true}
     });
     return res.data;
 }
@@ -131,6 +139,7 @@ void test_simple() {
     slassert(ROOT_RESP == http_get(ROOT_URL));
     slassert("foo" == http_post(ROOT_URL + "postmirror", "foo"));    
     slassert(404 == http_get_code(ROOT_URL + "foo"));
+    slassert(STATIC_FILE_DATA == http_get(ROOT_URL + "sendfile"));
 }
 
 void test_logging() {

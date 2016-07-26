@@ -61,9 +61,9 @@ void test_send_file() {
     }
     auto server = create_server();
     auto client = wilton::HttpClient();
-    auto res = client.send_file("http://127.0.0.1:8080/mirror", filename);
-    // todo: investigate intermittent fail
-//    slassert(res.data == "hello");
+    auto res = client.send_file("http://127.0.0.1:8080/mirror", filename, {{"forceHttp10", true}});
+    // todo: investigate intermittent fail with keepalive
+    slassert(res.data == "hello");
 }
 
 int main() {

@@ -88,6 +88,9 @@ private:
             try {
                 pa->second(req, resp);
             } catch(const std::exception& e) {
+                logger.warn(UTRACEMSG(icu::UnicodeString::fromUTF8(e.what()) + "\n" + 
+                        "Callback error, path: [" + req.get_pathname() + "], " +
+                        " method: [" + req.get_method() + "]"));
                 resp.set_status_code(500);
                 resp.set_status_message("Internal Server Error");
                 auto msg = icu::UnicodeString::fromUTF8(e.what());
