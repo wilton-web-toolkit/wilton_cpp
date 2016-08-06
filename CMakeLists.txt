@@ -98,8 +98,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         soci
         jansson
         libcurl
-        libssl
-        libcrypto
+        openssl
         zlib 
         sqlite3
         wilton )
@@ -123,11 +122,15 @@ target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS}
         ${${PROJECT_NAME}_DEPS_PRIVATE_PC_INCLUDE_DIRS} )
-target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
+target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PUBLIC_PC_CFLAGS_OTHER} )
+if ( ${CMAKE_CXX_COMPILER_ID}x MATCHES "MSVCx" )
+    target_compile_options ( ${PROJECT_NAME} PRIVATE /wd4800 )
+endif ( )
 target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DSTATICLIB_WITH_ICU )
 
 # pkg-config
-wilton_cpp_list_to_string ( ${PROJECT_NAME}_PC_CFLAGS "-I" ${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS )
+set ( ${PROJECT_NAME}_PUBLIC_FLAGS ${${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS} ${${PROJECT_NAME}_DEPS_PUBLIC_PC_CFLAGS_OTHER} )
+wilton_cpp_list_to_string ( ${PROJECT_NAME}_PC_CFLAGS "-I" ${PROJECT_NAME}_PUBLIC_FLAGS )
 set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -I${CMAKE_CURRENT_LIST_DIR}/include -DSTATICLIB_WITH_ICU" )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -l${PROJECT_NAME}" )
 if ( CMAKE_SYSTEM_NAME STREQUAL "Linux" )

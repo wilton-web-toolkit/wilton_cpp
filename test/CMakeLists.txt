@@ -65,6 +65,8 @@ staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_cpp )
 set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton_cpp )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
 set ( ${PROJECT_NAME}_DEPS_PRIVATE
+        staticlib_config
+        staticlib_pimpl
         staticlib_io
         staticlib_ranges
         staticlib_httpserver
@@ -75,13 +77,13 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_serialization
         staticlib_utils
         staticlib_icu
+        icu-uc
         log4cplus
         mstch
         soci
         jansson
         libcurl
-        libssl
-        libcrypto
+        openssl
         zlib 
         sqlite3
         wilton )
