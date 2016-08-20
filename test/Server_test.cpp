@@ -30,7 +30,7 @@ namespace su = staticlib::utils;
 const uint16_t TCP_PORT = 8080;
 const icu::UnicodeString ROOT_URL = "http://127.0.0.1:" + iu::to_ustring(TCP_PORT) + "/";
 const uint16_t TCP_PORT_HTTPS = 8443;
-const icu::UnicodeString ROOT_URL_HTTPS = "https://127.0.0.1:" + iu::to_ustring(TCP_PORT_HTTPS) + "/";
+const icu::UnicodeString ROOT_URL_HTTPS = "https://localhost:" + iu::to_ustring(TCP_PORT_HTTPS) + "/";
 const icu::UnicodeString ROOT_RESP = "Hello C++!\n";
 const icu::UnicodeString LOG_DATA = "Please append me to log";
 const icu::UnicodeString STATIC_FILE_DATA = "I am data from static file\n";
@@ -265,12 +265,11 @@ void test_https() {
         {"sslkeyFilename", "../test/certificates/client/testclient.key"},
         {"sslKeyType", "PEM"},
         {"sslKeypasswd", "test"},
-        {"sslVerifyhost", true},
+        {"sslVerifyhost", true}, // localhost in URL is important here
         {"sslVerifypeer", true},
         {"cainfoFilename", "../test/certificates/client/staticlibs_test_ca.cer"}
     });
-    // todo: fixme on windows
-    //slassert(ROOT_RESP == resp.data);
+    slassert(ROOT_RESP == resp.data);
 }
 
 void test_request_data_file() {
