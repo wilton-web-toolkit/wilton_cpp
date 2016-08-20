@@ -67,7 +67,7 @@ private:
         try {
             self->gateway_cb_internal(request);
         } catch (const std::exception& e) {
-            logger.error(UTRACEMSG(icu::UnicodeString::fromUTF8(e.what()) + "\nGateway error"));
+            logger.error(UTRACEMSG(iu::from_utf8(e.what()) + "\nGateway error"));
         } catch (...) {
             logger.error(UTRACEMSG("Gateway error"));
         }
@@ -88,12 +88,12 @@ private:
             try {
                 pa->second(req, resp);
             } catch(const std::exception& e) {
-                logger.warn(UTRACEMSG(icu::UnicodeString::fromUTF8(e.what()) + "\n" + 
+                logger.warn(UTRACEMSG(iu::from_utf8(e.what()) + "\n" + 
                         "Callback error, path: [" + req.get_pathname() + "], " +
                         " method: [" + req.get_method() + "]"));
                 resp.set_status_code(500);
                 resp.set_status_message("Internal Server Error");
-                auto msg = icu::UnicodeString::fromUTF8(e.what());
+                auto msg = iu::from_utf8(e.what());
                 resp.send(UTRACEMSG(msg));
             }
         } else {

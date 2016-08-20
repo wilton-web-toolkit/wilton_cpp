@@ -107,7 +107,7 @@ private:
         try {
             fin(1 == success);
         } catch(const std::exception& e) {
-            logger.error(UTRACEMSG(icu::UnicodeString::fromUTF8(e.what()) + "\nFinalizer error"));
+            logger.error(UTRACEMSG(iu::from_utf8(e.what()) + "\nFinalizer error"));
         } catch(...) {
             logger.error(UTRACEMSG("Finalizer error"));
         }
