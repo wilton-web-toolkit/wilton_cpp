@@ -231,9 +231,9 @@ void test_headers() {
     
     auto client_headers = ss::load_json_from_ustring(resp.data);
     slassert("foo" == client_headers.getu("X-Dupl-H").get_ustring());
-    slassert(ss::JsonType::STRING == client_headers.getu("referer").get_type() || 
-            ss::JsonType::STRING == client_headers.getu("Referer").get_type());
-    if (ss::JsonType::STRING == client_headers.getu("referer").get_type()) {
+    slassert(ss::JsonType::STRING == client_headers.getu("referer").type() || 
+            ss::JsonType::STRING == client_headers.getu("Referer").type());
+    if (ss::JsonType::STRING == client_headers.getu("referer").type()) {
         slassert("bar" == client_headers.getu("referer").get_ustring());
     } else {
         slassert("foo" == client_headers.getu("Referer").get_ustring());

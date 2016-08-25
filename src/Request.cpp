@@ -60,7 +60,7 @@ public:
             wilton_free(meta);
             throw;
         }
-        for (const ss::JsonField& fi : json.get_object()) {
+        for (const ss::JsonField& fi : json.as_object()) {
             if ("httpVersion" == fi.get_uname()) {
                 this->http_version = fi.get_ustring();
             } else if ("protocol" == fi.get_uname()) {
@@ -74,7 +74,7 @@ public:
             } else if ("url" == fi.get_uname()) {
                 this->url = fi.get_ustring();
             } else if ("headers" == fi.get_uname()) {
-                for (const ss::JsonField& he : fi.get_object()) {
+                for (const ss::JsonField& he : fi.as_object()) {
                     headers.insert(std::make_pair(he.get_uname(), he.get_ustring()));
                 }
             }
