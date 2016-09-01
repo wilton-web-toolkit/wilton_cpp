@@ -61,21 +61,21 @@ public:
             throw;
         }
         for (const ss::JsonField& fi : json.as_object()) {
-            if ("httpVersion" == fi.get_uname()) {
-                this->http_version = fi.get_ustring();
-            } else if ("protocol" == fi.get_uname()) {
-                this->protocol = fi.get_ustring();
-            } else if ("method" == fi.get_uname()) {
-                this->method = fi.get_ustring();
-            } else if ("pathname" == fi.get_uname()) {
-                this->pathname = fi.get_ustring();
-            } else if ("quiery" == fi.get_uname()) {
-                this->quiery = fi.get_ustring();
-            } else if ("url" == fi.get_uname()) {
-                this->url = fi.get_ustring();
-            } else if ("headers" == fi.get_uname()) {
+            if ("httpVersion" == fi.uname()) {
+                this->http_version = fi.as_ustring();
+            } else if ("protocol" == fi.uname()) {
+                this->protocol = fi.as_ustring();
+            } else if ("method" == fi.uname()) {
+                this->method = fi.as_ustring();
+            } else if ("pathname" == fi.uname()) {
+                this->pathname = fi.as_ustring();
+            } else if ("quiery" == fi.uname()) {
+                this->quiery = fi.as_ustring();
+            } else if ("url" == fi.uname()) {
+                this->url = fi.as_ustring();
+            } else if ("headers" == fi.uname()) {
                 for (const ss::JsonField& he : fi.as_object()) {
-                    headers.insert(std::make_pair(he.get_uname(), he.get_ustring()));
+                    headers.insert(std::make_pair(he.uname(), he.as_ustring()));
                 }
             }
         }

@@ -22,49 +22,49 @@ namespace ss = staticlib::serialization;
 
 ClientResponse::ClientResponse(const staticlib::serialization::JsonValue& resp) {
     for (const ss::JsonField& fi : resp.as_object()) {
-        if ("headers" == fi.get_uname()) {
+        if ("headers" == fi.uname()) {
             for (const ss::JsonField& he : fi.as_object()) {
-                headers.insert(std::make_pair(he.get_uname(), he.get_ustring()));
+                headers.insert(std::make_pair(he.uname(), he.as_ustring()));
             }
-        } else if ("data" == fi.get_uname()) {
-            this->data = fi.get_ustring();
-        } else if ("effectiveUrl" == fi.get_uname()) {
-            this->effective_url = fi.get_ustring();
-        } else if ("responseCode" == fi.get_uname()) {
+        } else if ("data" == fi.uname()) {
+            this->data = fi.as_ustring();
+        } else if ("effectiveUrl" == fi.uname()) {
+            this->effective_url = fi.as_ustring();
+        } else if ("responseCode" == fi.uname()) {
             this->response_code = fi.as_uint16();
-        } else if ("totalTimeSecs" == fi.get_uname()) {
+        } else if ("totalTimeSecs" == fi.uname()) {
             this->total_time_secs = fi.as_double();
-        } else if ("namelookupTimeSecs" == fi.get_uname()) {
+        } else if ("namelookupTimeSecs" == fi.uname()) {
             this->namelookup_time_secs = fi.as_double();
-        } else if ("connectTimeSecs" == fi.get_uname()) {
+        } else if ("connectTimeSecs" == fi.uname()) {
             this->connect_time_secs = fi.as_double();
-        } else if ("appconnectTimeSecs" == fi.get_uname()) {
+        } else if ("appconnectTimeSecs" == fi.uname()) {
             this->appconnect_time_secs = fi.as_double();
-        } else if ("pretransferTimeSecs" == fi.get_uname()) {
+        } else if ("pretransferTimeSecs" == fi.uname()) {
             this->pretransfer_time_secs = fi.as_double();
-        } else if ("starttransferTimeSecs" == fi.get_uname()) {
+        } else if ("starttransferTimeSecs" == fi.uname()) {
             this->starttransfer_time_secs = fi.as_double();
-        } else if ("redirectTimeSecs" == fi.get_uname()) {
+        } else if ("redirectTimeSecs" == fi.uname()) {
             this->redirect_time_secs = fi.as_double();
-        } else if ("redirectCount" == fi.get_uname()) {
+        } else if ("redirectCount" == fi.uname()) {
             this->redirect_count = fi.as_uint32();
-        } else if ("speedDownloadBytesSecs" == fi.get_uname()) {
+        } else if ("speedDownloadBytesSecs" == fi.uname()) {
             this->speed_download_bytes_secs = fi.as_double();
-        } else if ("speedUploadBytesSecs" == fi.get_uname()) {
+        } else if ("speedUploadBytesSecs" == fi.uname()) {
             this->speed_upload_bytes_secs = fi.as_double();
-        } else if ("headerSizeBytes" == fi.get_uname()) {
+        } else if ("headerSizeBytes" == fi.uname()) {
             this->header_size_bytes = fi.as_uint32();
-        } else if ("requestSizeBytes" == fi.get_uname()) {
+        } else if ("requestSizeBytes" == fi.uname()) {
             this->request_size_bytes = fi.as_uint32();
-        } else if ("sslVerifyresult" == fi.get_uname()) {
+        } else if ("sslVerifyresult" == fi.uname()) {
             this->ssl_verifyresult = fi.as_int16();
-        } else if ("osErrno" == fi.get_uname()) {
+        } else if ("osErrno" == fi.uname()) {
             this->os_errno = fi.as_int32();
-        } else if ("numConnects" == fi.get_uname()) {
+        } else if ("numConnects" == fi.uname()) {
             this->num_connects = fi.as_uint32();
-        } else if ("primaryIp" == fi.get_uname()) {
-            this->primary_ip = fi.get_ustring();
-        } else if ("primaryPort" == fi.get_uname()) {
+        } else if ("primaryIp" == fi.uname()) {
+            this->primary_ip = fi.as_ustring();
+        } else if ("primaryPort" == fi.uname()) {
             this->primary_port = fi.as_uint16();
         }
     }
