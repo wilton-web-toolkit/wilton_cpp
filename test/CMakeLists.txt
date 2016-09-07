@@ -59,6 +59,7 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_cpp )
 
@@ -74,6 +75,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_orm
         staticlib_httpclient
         staticlib_cron
+        staticlib_tinydir
         staticlib_serialization
         staticlib_utils
         staticlib_icu

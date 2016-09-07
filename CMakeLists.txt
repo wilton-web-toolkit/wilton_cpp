@@ -73,6 +73,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
+    wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
     add_subdirectory ( ${WILTON_DEPS}/libwilton ${CMAKE_BINARY_DIR}/libwilton )
 endif ( )
 
@@ -90,6 +91,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_orm
         staticlib_httpclient
         staticlib_cron
+        staticlib_tinydir
         staticlib_serialization
         staticlib_utils
         staticlib_icu
