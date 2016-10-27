@@ -41,6 +41,8 @@ public:
     
     const icu::UnicodeString& get_quiery() const;
     
+    const std::map<icu::UnicodeString, icu::UnicodeString>& get_queries() const;
+    
     const icu::UnicodeString& get_url() const;
     
     const std::map<icu::UnicodeString, icu::UnicodeString>& get_headers() const;

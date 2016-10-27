@@ -23,6 +23,7 @@ namespace si = staticlib::icu_utils;
 namespace ss = staticlib::serialization;
 
 using headers_map_type = const std::map<icu::UnicodeString, icu::UnicodeString>&;
+using queries_map_type = const std::map<icu::UnicodeString, icu::UnicodeString>&;
 
 } // namespace
 
@@ -33,6 +34,7 @@ class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
     icu::UnicodeString method;
     icu::UnicodeString pathname;
     icu::UnicodeString quiery;
+    std::map<icu::UnicodeString, icu::UnicodeString> queries;
     icu::UnicodeString url;
     std::map<icu::UnicodeString, icu::UnicodeString> headers;
     
@@ -71,6 +73,10 @@ public:
                 this->pathname = fi.as_ustring();
             } else if ("quiery" == fi.uname()) {
                 this->quiery = fi.as_ustring();
+            } else if ("queries" == fi.uname()) {
+                for (const ss::JsonField& qu : fi.as_object()) {
+                    queries.insert(std::make_pair(qu.uname(), qu.as_ustring()));
+                }
             } else if ("url" == fi.uname()) {
                 this->url = fi.as_ustring();
             } else if ("headers" == fi.uname()) {
@@ -99,6 +105,10 @@ public:
 
     const icu::UnicodeString& get_quiery(const Request&) const {
         return quiery;
+    }
+    
+    const queries_map_type get_queries(const Request&) const {
+        return queries;
     }
 
     const icu::UnicodeString& get_url(const Request&) const {
@@ -158,6 +168,7 @@ PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_protocol, (), (cons
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_method, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_pathname, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_quiery, (), (const), WiltonException)
+PIMPL_FORWARD_METHOD(Request, queries_map_type, get_queries, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, const icu::UnicodeString&, get_url, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, headers_map_type, get_headers, (), (const), WiltonException)
 PIMPL_FORWARD_METHOD(Request, icu::UnicodeString, get_data, (), (const), WiltonException)
