@@ -61,8 +61,8 @@ void test_send_file() {
     }
     auto server = create_server();
     auto client = wilton::HttpClient();
+    // forceHttp10 added to speed up test under valgrind
     auto res = client.send_file("http://127.0.0.1:8080/mirror", filename, {{"forceHttp10", true}});
-    // todo: investigate intermittent fail with keepalive
     slassert(res.data == "hello");
 }
 
