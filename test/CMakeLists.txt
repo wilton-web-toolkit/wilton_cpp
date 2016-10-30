@@ -44,7 +44,6 @@ if ( NOT STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_icu )
 endif ( )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
@@ -60,6 +59,7 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_cpp )
 
@@ -75,13 +75,13 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_orm
         staticlib_httpclient
         staticlib_cron
+        staticlib_mustache
         staticlib_tinydir
         staticlib_serialization
         staticlib_utils
         staticlib_icu
         icu-uc
         log4cplus
-        mstch
         soci
         jansson
         libcurl

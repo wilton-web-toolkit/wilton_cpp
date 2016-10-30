@@ -7,6 +7,7 @@
 
 #include "wilton/Server.hpp"
 
+#include <algorithm>
 #include <array>
 #include <iostream>
 #include <map>
@@ -16,14 +17,15 @@
 
 #include "staticlib/config/assert.hpp"
 #include "staticlib/icu_utils.hpp"
+#include "staticlib/httpclient.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "wilton/HttpClient.hpp"
 #include "wilton/Logger.hpp"
 
 namespace iu = staticlib::icu_utils;
 namespace io = staticlib::io;
+namespace sh = staticlib::httpclient;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
@@ -36,7 +38,8 @@ const icu::UnicodeString LOG_DATA = "Please append me to log";
 const icu::UnicodeString STATIC_FILE_DATA = "I am data from static file\n";
 const icu::UnicodeString STATIC_ZIP_DATA = "I am data from ZIP file\n";
 
-wilton::HttpClient HTTP = wilton::HttpClient();
+sh::HttpSession HTTP = sh::HttpSession();
+std::array<char, 4096> BUFFER;
 wilton::Logger LOGGER = wilton::Logger("test.wilton.Server_test");
 
 std::map<icu::UnicodeString, std::function<void(const wilton::Request&, wilton::Response&)>> create_handlers() {
@@ -90,37 +93,43 @@ std::map<icu::UnicodeString, std::function<void(const wilton::Request&, wilton::
 }
 
 icu::UnicodeString http_get(const icu::UnicodeString& url) {
-    auto res = HTTP.execute(url);
-    return res.data;
+    auto src = HTTP.open_url(iu::to_utf8(url));
+    auto sink = iu::ustring_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
+    return sink.get_string();
 }
 
 uint16_t http_get_code(const icu::UnicodeString& url) {
-    auto res = HTTP.execute(url, "", {
-        {"abortOnResponseError", false}
-    });
-    return res.response_code;
+    auto opts = sh::HttpRequestOptions();
+    opts.abort_on_response_error = false;
+    auto src = HTTP.open_url(iu::to_utf8(url), opts);
+    auto sink = io::null_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
+    return src.get_info().response_code;
 }
 
 icu::UnicodeString http_get_header(const icu::UnicodeString& url, const icu::UnicodeString& header) {
-    auto res = HTTP.execute(url);
-    auto pa = res.headers.find(header);
-    return res.headers.end() != pa ? pa->second : "";
+    auto src = HTTP.open_url(iu::to_utf8(url));
+    auto sink = io::null_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
+    auto& headers = src.get_info().get_headers();
+    return iu::from_utf8(src.get_info().get_header(iu::to_utf8(header)));
 }
 
 icu::UnicodeString http_post(const icu::UnicodeString& url, const icu::UnicodeString& data) {
-    auto res = HTTP.execute(url, data, {
-        {"method", "POST"},
-        // todo: investigate me
-        {"forceHttp10", true}
-    });
-    return res.data;
+    auto opts = sh::HttpRequestOptions();
+    opts.method = "POST";
+    opts.force_http_10 = true;
+    auto src = HTTP.open_url(iu::to_utf8(url), iu::uarray_source(data), opts);
+    auto sink = iu::ustring_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
+    return sink.get_string();
 }
 
 icu::UnicodeString read_file_to_string(const icu::UnicodeString& filename) {
     auto file = su::FileDescriptor(iu::to_utf8(filename), 'r');
     auto sink = iu::ustring_sink();
-    std::array<char, 1024> buf;
-    io::copy_all(file, sink, buf.data(), buf.size());
+    io::copy_all(file, sink, BUFFER.data(), BUFFER.size());
     return sink.get_string();
 }
 
@@ -219,17 +228,16 @@ void test_headers() {
     auto server = wilton::Server(std::move(conf), create_handlers());
     
     slassert(ROOT_RESP == http_get(ROOT_URL));
-    auto resp = HTTP.execute(ROOT_URL + "headers", "", {
-        {"method", "GET"},
-        {"headers", {
-                {"X-Dupl-H", "foo"},
-                {"Referer", "foo"},
-                {"referer", "bar"}
-            }
-        }
-    });
+    auto opts = sh::HttpRequestOptions();
+    opts.method = "GET";
+    opts.headers.emplace_back("X-Dupl-H", "foo");
+    opts.headers.emplace_back("Referer", "foo");
+    opts.headers.emplace_back("referer", "bar");
+    auto src = HTTP.open_url(iu::to_utf8(ROOT_URL + "headers"), opts);
+    auto sink = iu::ustring_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
     
-    auto client_headers = ss::load_json_from_ustring(resp.data);
+    auto client_headers = ss::load_json_from_ustring(sink.get_string());
     slassert("foo" == client_headers["X-Dupl-H"].as_ustring());
     slassert(ss::JsonType::STRING == client_headers["referer"].type() || 
             ss::JsonType::STRING == client_headers["Referer"].type());
@@ -238,12 +246,9 @@ void test_headers() {
     } else {
         slassert("foo" == client_headers["Referer"].as_ustring());
     }
-    auto h1 = resp.headers.find("X-Server-H1");
-    slassert(resp.headers.end() != h1 && "foo" == h1->second);
-    auto h2 = resp.headers.find("X-Server-H2");
-    slassert(resp.headers.end() != h2 && "bar" == h2->second);
-    auto xp = resp.headers.find("X-Proto");
-    slassert(resp.headers.end() != xp && "http" == xp->second);
+    slassert("foo" == src.get_info().get_header("X-Server-H1"));
+    slassert("bar" == src.get_info().get_header("X-Server-H2"));
+    slassert("http" == src.get_info().get_header("X-Proto"));
 }
 
 void test_https() {
@@ -258,18 +263,20 @@ void test_https() {
             }
         },
     }, create_handlers());
-    auto resp = HTTP.execute(ROOT_URL_HTTPS, "", {
-        {"method", "GET"},
-        {"sslcertFilename", "../test/certificates/client/testclient.cer"},
-        {"sslcertype", "PEM"},
-        {"sslkeyFilename", "../test/certificates/client/testclient.key"},
-        {"sslKeyType", "PEM"},
-        {"sslKeypasswd", "test"},
-        {"sslVerifyhost", true}, // localhost in URL is important here
-        {"sslVerifypeer", true},
-        {"cainfoFilename", "../test/certificates/client/staticlibs_test_ca.cer"}
-    });
-    slassert(ROOT_RESP == resp.data);
+    auto opts = sh::HttpRequestOptions();
+    opts.method = "GET";
+    opts.sslcert_filename = "../test/certificates/client/testclient.cer";
+    opts.sslcertype = "PEM";
+    opts.sslkey_filename = "../test/certificates/client/testclient.key";
+    opts.ssl_key_type = "PEM";
+    opts.ssl_keypasswd = "test";
+    opts.ssl_verifyhost = true; // localhost in URL is important here
+    opts.ssl_verifypeer = true;
+    opts.cainfo_filename = "../test/certificates/client/staticlibs_test_ca.cer";
+    auto src = HTTP.open_url(iu::to_utf8(ROOT_URL_HTTPS), opts);
+    auto sink = iu::ustring_sink();
+    io::copy_all(src, sink, BUFFER.data(), BUFFER.size());
+    slassert(ROOT_RESP == sink.get_string());
 }
 
 void test_request_data_file() {

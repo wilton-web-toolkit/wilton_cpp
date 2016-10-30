@@ -57,7 +57,6 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
         wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
         wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/external_icu )
     endif ( )
-    wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
@@ -74,6 +73,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
     wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
+    wilton_cpp_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
     add_subdirectory ( ${WILTON_DEPS}/libwilton ${CMAKE_BINARY_DIR}/libwilton )
 endif ( )
 
@@ -91,12 +91,12 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_orm
         staticlib_httpclient
         staticlib_cron
+        staticlib_mustache
         staticlib_tinydir
         staticlib_serialization
         staticlib_utils
         staticlib_icu
         log4cplus
-        mstch
         soci
         jansson
         libcurl
