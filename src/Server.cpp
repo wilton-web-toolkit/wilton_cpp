@@ -35,6 +35,26 @@ public:
     }
 };
 
+class HttpPathDeleter {
+public:
+    void operator()(wilton_HttpPath* path) {
+        wilton_HttpPath_destroy(path);
+    }
+};
+
+std::unique_ptr<wilton_HttpPath, HttpPathDeleter> create_path(std::string method, std::string path, 
+        void* ctx, void (*cb)(void* handler_ctx, wilton_Request* request)) {
+    wilton_HttpPath* wp = nullptr;
+    auto err = wilton_HttpPath_create(&wp, method.c_str(), method.length(), path.c_str(), path.length(),
+            ctx, cb);
+    if (nullptr != err) {
+        std::string trace = TRACEMSG(err);
+        wilton_free(err);
+        throw WiltonException(trace);
+    }
+    return std::unique_ptr<wilton_HttpPath, HttpPathDeleter>(wp, HttpPathDeleter());
+}
+
 } // namespace
 
 class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
@@ -48,8 +68,20 @@ public:
 //        logger.info("Starting Wilton HTTP Server ...");
         std::string conf_str = ss::dump_json_to_string(conf);
         wilton_Server* srv_ptr;
-        char* err = wilton_Server_create(std::addressof(srv_ptr), this, Impl::gateway_cb, 
-                conf_str.data(), conf_str.length());
+        // todo: drop this temporary workaround
+        std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> paths;
+        paths.emplace_back(create_path("GET", "/", this, Impl::gateway_cb));
+        paths.emplace_back(create_path("POST", "/", this, Impl::gateway_cb));
+        paths.emplace_back(create_path("PUT", "/", this, Impl::gateway_cb));
+        paths.emplace_back(create_path("DELETE", "/", this, Impl::gateway_cb));
+        paths.emplace_back(create_path("OPTIONS", "/", this, Impl::gateway_cb));
+        std::vector<wilton_HttpPath*> ptrs;
+        for (auto& pt : paths) {
+            ptrs.push_back(pt.get());
+        }
+        // end todo
+        char* err = wilton_Server_create(std::addressof(srv_ptr), conf_str.data(), conf_str.length(), 
+                ptrs.data(), ptrs.size());
         if (nullptr != err) {
             std::string trace = TRACEMSG(err);
             wilton_free(err);
